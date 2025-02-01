@@ -1,6 +1,6 @@
 package com.gse.assignment.controller;
 
-import com.gse.assignment.Entry.ContactEntry;
+import com.gse.assignment.entry.ContactEntry;
 import com.gse.assignment.service.ContactService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.gse.assignment.Entry.ContactEntry;
+import com.gse.assignment.entry.ContactEntry;
 import com.gse.assignment.exception.InvalidContactFormatException;
 
 import java.io.IOException;

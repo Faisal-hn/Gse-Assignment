@@ -1,6 +1,6 @@
 package com.gse.assignment.validator;
 
-import com.gse.assignment.Entry.ContactEntry;
+import com.gse.assignment.entry.ContactEntry;
 import com.gse.assignment.exception.InvalidContactFormatException;
 import org.springframework.stereotype.Component;
 

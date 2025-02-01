@@ -1,6 +1,6 @@
 package com.gse.assignment.service;
 
-import com.gse.assignment.Entry.ContactEntry;
+import com.gse.assignment.entry.ContactEntry;
 import com.gse.assignment.domain.Contact;
 import com.gse.assignment.repository.ContactRepository;
 import com.gse.assignment.validator.ContactValidator;

@@ -1,4 +1,4 @@
-package com.gse.assignment.Entry;
+package com.gse.assignment.entry;
 
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
