@@ -1,13 +1,15 @@
 package com.gse.assignment.validator;
 
 import com.gse.assignment.Entry.ContactEntry;
+import com.gse.assignment.exception.InvalidContactFormatException;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ContactValidator {
 
-    private static final String ERROR_MESSAGE = "Either Email or Phone number is undefined, please check.";
-    private static final String EMPTY_EMAIL_MESSAGE = "Email is empty, please check.";
+    private static final String ERROR_EMAIL_REQUIRED = "Email cannot be empty or null.";
+    private static final String ERROR_INVALID_EMAIL = "Invalid email format.";
+    private static final String ERROR_MESSAGE = "Phone cannot be null.";
     private static final String EMAIL_REGEX = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
 
 
@@ -18,16 +20,16 @@ public class ContactValidator {
 
     private void validateEmail(String email) {
         if (email == null || email.isEmpty()) {
-            throw new IllegalArgumentException(EMPTY_EMAIL_MESSAGE);
+            throw new InvalidContactFormatException(ERROR_EMAIL_REQUIRED);
         }
         if (!email.matches(EMAIL_REGEX)) {
-            throw new IllegalArgumentException(ERROR_MESSAGE);
+            throw new InvalidContactFormatException(ERROR_INVALID_EMAIL);
         }
     }
 
     private void validatePhone(Long phone) {
         if (phone == null) {
-            throw new IllegalArgumentException(ERROR_MESSAGE);
+            throw new InvalidContactFormatException(ERROR_MESSAGE);
         }
     }
 }

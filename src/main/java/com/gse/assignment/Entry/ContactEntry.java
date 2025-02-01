@@ -1,5 +1,10 @@
 package com.gse.assignment.Entry;
 
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.gse.assignment.utils.ContactEntryDeserializer;
+
+@JsonDeserialize(using = ContactEntryDeserializer.class)
 public class ContactEntry {
     private String email;
     private Long phone;
