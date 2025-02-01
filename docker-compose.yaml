@@ -17,7 +17,7 @@ services:
       - ./src/main/resources/schema.sql://docker-entrypoint-initdb.d/schema.sql
 
   application:
-    image: gse-cart-contact-app
+    image: faisalhn/gse-cart-contact-app
     ports:
       - "8080:8080"
     expose:
