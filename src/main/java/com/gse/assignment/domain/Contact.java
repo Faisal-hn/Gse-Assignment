@@ -53,14 +53,4 @@ public class Contact {
     // Constructors
     public Contact() {
     }
-
-    @Override
-    public String toString() {
-        return "Contact{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
-                ", phone=" + phone +
-                ", primaryId=" + primaryId +
-                '}';
-    }
 }
