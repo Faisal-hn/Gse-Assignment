@@ -31,8 +31,8 @@ public class ContactService {
             primaryContact = consolidateContacts(emailMatch, phoneMatch);
         } else if (emailMatch != null || phoneMatch != null) {
             // Add secondary record
-            primaryContact = emailMatch != null ? emailMatch : phoneMatch;
-            addSecondaryRecord(primaryContact, contactEntry);
+            Contact existingContact = emailMatch != null ? emailMatch : phoneMatch;
+            primaryContact = addSecondaryRecord(existingContact, contactEntry);
         } else {
             // Create new primary record
             primaryContact = createNewPrimaryContact(contactEntry);
@@ -52,18 +52,39 @@ public class ContactService {
     }
 
     private Contact consolidateContacts(Contact contact1, Contact contact2) {
-        Contact primaryContact = contact1.getId() < contact2.getId() ? contact1 : contact2;
-        Contact secondaryContact = contact1.getId() < contact2.getId() ? contact2 : contact1;
-        secondaryContact.setPrimaryId(primaryContact.getPrimaryId());
-        return contactRepository.save(secondaryContact);
+        Contact primaryContact1 = getPrimaryContact(contact1);
+        Contact primaryContact2 = getPrimaryContact(contact2);
+        if (primaryContact1.getId() < primaryContact2.getId()) {
+            primaryContact2.setPrimaryId(primaryContact1.getId());
+            contactRepository.save(primaryContact2);
+            return primaryContact1;
+        } else {
+            primaryContact1.setPrimaryId(primaryContact2.getId());
+            contactRepository.save(primaryContact1);
+            return primaryContact2;
+        }
     }
 
-    private void addSecondaryRecord(Contact primary, ContactEntry contactEntry) {
+    private Contact getPrimaryContact(Contact contact) {
+        if (contact.getPrimaryId() == null) {
+            return contact;
+        }
+        Long primaryId = contact.getPrimaryId();
+        Optional<Contact> parentContact = contactRepository.findById(primaryId);
+        if (parentContact.isPresent()) {
+            return getPrimaryContact(parentContact.get());
+        }
+        return contact;
+    }
+
+    private Contact addSecondaryRecord(Contact existingContact, ContactEntry contactEntry) {
+        Contact primary = getPrimaryContact(existingContact);
         Contact secondary = new Contact();
         secondary.setEmail(contactEntry.getEmail());
         secondary.setPhone(contactEntry.getPhone());
         secondary.setPrimaryId(primary.getId());
         contactRepository.save(secondary);
+        return primary;
     }
 
     private Contact createNewPrimaryContact(ContactEntry contactEntry) {
@@ -76,7 +97,7 @@ public class ContactService {
 
     private Map<String, Object> buildResponse(Contact primaryContact) {
         List<Contact> allRelatedContacts = getContactListByBfs(primaryContact);
-        Map<String, Object> response = new HashMap<>();
+        LinkedHashMap<String, Object> response = new LinkedHashMap<>();
         Set<Long> contactIds = new LinkedHashSet<>();
         Set<String> emails = new LinkedHashSet<>();
         Set<Long> phones = new LinkedHashSet<>();
@@ -109,7 +130,6 @@ public class ContactService {
                 }
             }
         }
-        result.sort(Comparator.comparing(Contact::getId));
         return new ArrayList<>(result);
     }
 
