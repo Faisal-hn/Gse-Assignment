@@ -1,5 +1,6 @@
 package com.gse.assignment.controller;
 
+import com.gse.assignment.Entry.ContactEntry;
 import com.gse.assignment.service.ContactService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +22,9 @@ class ContactController {
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> resolveContact(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<Map<String, Object>> resolveContact(@RequestBody ContactEntry contactEntry) {
         try {
-            String email = payload.get("email");
-            Long phone = payload.get("phone") == null ? null : Long.parseLong(payload.get("phone"));
-            Map<String, Object> response = contactService.resolveContact(email, phone);
+            Map<String, Object> response = contactService.resolveContact(contactEntry);
             return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("error", e.getMessage()));

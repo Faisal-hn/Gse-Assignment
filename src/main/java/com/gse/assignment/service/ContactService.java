@@ -1,27 +1,30 @@
 package com.gse.assignment.service;
 
+import com.gse.assignment.Entry.ContactEntry;
 import com.gse.assignment.domain.Contact;
 import com.gse.assignment.repository.ContactRepository;
+import com.gse.assignment.validator.ContactValidator;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class ContactService {
-    private static final String ERROR_MESSAGE = "Either Email or Phone number is undefined, please check.";
-    private static final String EMPTY_EMAIL_MESSAGE = "Email is empty, please check.";
 
     private final ContactRepository contactRepository;
 
-    public ContactService(ContactRepository contactRepository) {
+    private final ContactValidator contactValidator;
+
+    public ContactService(ContactRepository contactRepository, ContactValidator contactValidator) {
         this.contactRepository = contactRepository;
+        this.contactValidator = contactValidator;
     }
 
-    public Map<String, Object> resolveContact(String email, Long phone) {
-        validateInput(email, phone);
+    public Map<String, Object> resolveContact(ContactEntry contactEntry) {
+        contactValidator.validateInput(contactEntry);
 
-        Contact emailMatch = getByEmail(email);
-        Contact phoneMatch = getByPhone(phone);
+        Contact emailMatch = getByEmail(contactEntry.getEmail());
+        Contact phoneMatch = getByPhone(contactEntry.getPhone());
         Contact primaryContact;
         if (emailMatch != null && phoneMatch != null) {
             // Link contacts if different primaries
@@ -29,21 +32,13 @@ public class ContactService {
         } else if (emailMatch != null || phoneMatch != null) {
             // Add secondary record
             primaryContact = emailMatch != null ? emailMatch : phoneMatch;
-            addSecondaryRecord(primaryContact, email, phone);
+            addSecondaryRecord(primaryContact, contactEntry);
         } else {
             // Create new primary record
-            primaryContact = createNewPrimaryContact(email, phone);
+            primaryContact = createNewPrimaryContact(contactEntry);
         }
 
         return buildResponse(primaryContact);
-    }
-
-    private void validateInput(String email, Long phone) {
-        if (email == null || phone == null) {
-            throw new IllegalArgumentException(ERROR_MESSAGE);
-        } else if (email.trim().isEmpty()) {
-            throw new IllegalArgumentException(EMPTY_EMAIL_MESSAGE);
-        }
     }
 
     private Contact getByEmail(String email) {
@@ -63,18 +58,18 @@ public class ContactService {
         return contactRepository.save(secondaryContact);
     }
 
-    private void addSecondaryRecord(Contact primary, String email, Long phone) {
+    private void addSecondaryRecord(Contact primary, ContactEntry contactEntry) {
         Contact secondary = new Contact();
-        secondary.setEmail(email);
-        secondary.setPhone(phone);
+        secondary.setEmail(contactEntry.getEmail());
+        secondary.setPhone(contactEntry.getPhone());
         secondary.setPrimaryId(primary.getId());
         contactRepository.save(secondary);
     }
 
-    private Contact createNewPrimaryContact(String email, Long phone) {
+    private Contact createNewPrimaryContact(ContactEntry contactEntry) {
         Contact contact = new Contact();
-        contact.setEmail(email);
-        contact.setPhone(phone);
+        contact.setEmail(contactEntry.getEmail());
+        contact.setPhone(contactEntry.getPhone());
         contact.setPrimaryId(null);
         return contactRepository.save(contact);
     }
